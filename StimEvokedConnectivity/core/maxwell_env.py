@@ -137,6 +137,7 @@ class MaxwellEnv(BaseEnv):
             self._init_log_stimulation()
 
         
+        # Ray: here stim electrodes are selected
         
         self.subscriber, self.stim_units, self.stim_electrodes_dict = init_maxone(
                 config, stim_electrodes, filt=filt,
@@ -188,7 +189,15 @@ class MaxwellEnv(BaseEnv):
         self.start_time = self.cur_time = time.perf_counter()
         self.last_stim_time = 0
 
-
+     # Ray: Add update_params function
+        ''' def update_electrodes(self, **params):    
+                for param, value in params.items():
+                    if hasattr(self, param) and value is not self.param:
+                        setattr(self, param, value)
+        #print out changes if verbose
+        
+             '''
+    
     def step(self, action=None, tag=None):
         '''
         Recieve events published since last time step() was called.
@@ -602,6 +611,8 @@ def power_cycle_stim_electrodes(stim_units):
     It appears this is needed to equilibrate the electrodes"
     - from maxwell code'''
 
+    # Ray: Can this be done in one for loop: power up, then power down, so as not to excede the max # of electrodes?
+    
     seq = maxlab.Sequence()
     for unit in stim_units:
         seq.append(
@@ -613,6 +624,9 @@ def power_cycle_stim_electrodes(stim_units):
     print('Power cycled')
     del seq
     seq = maxlab.Sequence()
+    
+    # Ray: Then remove this step and only power-on and connect 1 electrode at a time per step.
+    
     for unit in stim_units:
         seq.append(
                 unit.power_up(True).connect(True))
